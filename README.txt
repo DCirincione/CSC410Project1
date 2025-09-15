@@ -1,0 +1,45 @@
+IMPORTANT: You are free to edit any of my code.
+However, your player must work with the original version of my GameEngine
+
+----------------
+
+Your AI player can be composed of many files.
+However, please do not create your own files called "GameEngine.py" or "GameRules.py"
+
+(If your player uses a modified version of GameRules.py, please give your version a different name ... It makes the professor's life easier)
+
+----------------
+
+You can run a game between two players with the command:
+
+python GameEngine.py Alice Bob
+
+... replace Alice and Bob with the names of your players
+
+... The GameEngine assumes that any player Eve has a main file Eve.py
+
+---------------
+
+The GameEngine creates logfiles.
+(You way want to edit the GameEngine to change the logfile names)
+
+Once you have a logfile, you can watch the game in your web browser with the command:
+
+python VisualGame.py game0.log
+
+... replace game0.log with the logfile of the game you want to watch
+
+... Once VisualGame is running, you can go to your browser and visit:
+     http://127.0.0.1:5000/
+
+NOTE: Someday I would like to code up a better interface for watching games ... I realize it is a hassle to have to restart the Flask server when you want to switch which game you are watching.
+
+While you are watching a game in the web browser, you can advance to the next move by clicking the mouse button or pressing the right arrow key
+... You can go backwards to the previous move by pressing the left arrow key
+
+--------------
+
+VisualGame uses Flask, if you don't have Flask you can use the command:
+
+pip install flask
+

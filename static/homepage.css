@@ -1,0 +1,14 @@
+.heading-class{
+  text-align: center;
+  color: blue;
+}
+
+.center-para{
+    text-align: center;
+    font-size: large;
+    margin-top: 20px;
+}
+
+.big-button{
+  font-size: large;
+}

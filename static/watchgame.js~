@@ -1,0 +1,194 @@
+state_number = 0
+move_number = 0
+
+function fetchMatchup(){
+    URL = "/getplayers/";
+    
+    fetch(URL).then( response => response.json()).then( the_json => updateMatchup(the_json) );
+    
+}
+
+function updateMatchup(the_json){
+    play_l = the_json['Light']
+    play_d = the_json['Dark']
+    
+    // Set the matchup
+    matchup_elem = document.getElementById("matchup");
+    matchup_elem.innerHTML = play_l + " (Light) vs " + play_d + " (Dark)"
+}
+
+function fetchState() {
+    URL = "/gamestate/" + state_number;
+    state_number = state_number + 1;
+    
+    fetch(URL).then( response => response.json()).then( the_json => fetchMove(the_json) );
+}
+
+function fetchMove(state_json) {
+    URL = "/gamemove/" + move_number;
+    move_number = move_number + 1;
+
+    fetch(URL).then( response => response.json()).then( the_json => updateState(state_json, the_json) );
+}
+
+function previousState() {
+    state_number = state_number - 2;
+    URL = "/gamestate/" + state_number;
+    state_number = state_number + 1;
+
+    fetch(URL).then( response => response.json()).then( the_json => previousMove(the_json) );
+}
+    
+function previousMove() {
+    move_number = move_number - 2;
+    URL = "/gamemove/" + move_number;
+    move_number = move_number + 1;
+
+    fetch(URL).then( response => response.json()).then( the_json => updateState(the_json) );
+}
+
+function updateState(state_json, move_json) {
+    console.log(move_json)
+    
+    // Set the move number
+    move_num_elem = document.getElementById("move_num");
+    move_num_elem.innerHTML = move_number;
+    
+    // First set the current player
+    player = state_json['Turn'];
+    player_elem = document.getElementById("cur_player");
+    player_elem.innerHTML = player;
+
+    // Next set the captures for each player
+    l_cap = state_json['LightCapture']
+    d_cap = state_json['DarkCapture']
+    light_elem = document.getElementById("light_cap");
+    light_elem.innerHTML = l_cap;
+    dark_elem = document.getElementById("dark_cap");
+    dark_elem.innerHTML = d_cap;
+    
+    // Then update the gameboard
+    gameboard_elem = document.getElementById("gameboard");
+    gameboard_elem.innerHTML = '';
+    board_table = makeTable(state_json['Board'], move_json['Row'], move_json['Col'], move_json['Direction'])
+    gameboard_elem.appendChild(board_table)
+}
+
+function handleKeyPress(e){
+    switch (e.keyCode) {
+    case 37:  //Left Arrow
+	previousState();
+	break;
+    case 39: //Right Arrow
+	fetchState();
+	break;
+    }
+}
+
+function initializeState(){
+    fetchMatchup()
+    fetchState()
+    
+    gameboard_elem = document.getElementById("gameboard");
+    gameboard_elem.onclick=fetchState;
+
+    document.onkeydown = handleKeyPress;
+}
+
+//Checks to see if tar_r, tar_c
+//can be reached starting at r,c and going in the direction dir
+function isRightDirection(r,c, dir, tar_r, tar_c){
+    if (dir == 'E'){
+	dr = 0;
+	dc = 1;
+    }
+    if (dir == 'W'){
+	dr = 0;
+	dc = -1;
+    }
+    if (dir == 'N'){
+	dr = -1;
+	dc = 0;
+    }
+    if (dir == 'S'){
+	dr = 1;
+	dc = 0;
+    }
+    if (dir == 'NW'){
+	dr = -1;
+	dc = -1;
+    }
+    if (dir == 'SW'){
+	dr = 1;
+	dc = -1;
+    }
+    if (dir == 'SE'){
+	dr = 1;
+	dc = 1;
+    }
+    if (dir == 'NE'){
+	dr = -1;
+	dc = 1;
+    }
+
+    new_r = r + dr;
+    new_c = c + dc;
+    answer = false;
+    
+    while ((new_c >= 0) && (new_c < 6) && (new_r >= 0) && (new_r < 6)){
+	if ((new_r == tar_r) && (new_c == tar_c)){
+	    answer = true;
+	}
+	new_r += dr;
+	new_c += dc;
+    }
+
+    return answer;
+}
+
+function makeTable(board_array, r, c, dir){
+    tbl = document.createElement('table');
+    tbl.style.width = '300px';
+    tbl.style.fontSize = '30px';
+    tbl.style.border = '1px solid black';
+    tbl.style.marginLeft = 'auto';
+    tbl.style.marginRight = 'auto';
+    tbl.style.tableLayout = 'fixed';
+
+    for (let i = 0; i < 6; i++){
+	tr = tbl.insertRow();
+	for (let j = 0; j < 6; j++){
+	    td = tr.insertCell();
+	    td.style.width = '75px';
+	    td.style.height = '75px';
+	    td.style.textAlign = 'center';
+	    td.style.position = 'relative';
+	    if ((j + i)%2 == 0){
+		td.style.border = '1px solid black';
+		td.style.backgroundColor = 'black';
+		td.style.color = 'white';
+	    }
+	    else {
+		td.style.border = '1px solid white';
+		td.style.backgroundColor = 'white';
+		td.style.color = 'black';
+	    }
+	    if ((i == r) && (j == c)){
+		td.style.border = '5px solid red';
+		td.style.color = 'red';
+	    }
+	    if (isRightDirection(r,c, dir, i, j) == true){
+		td.style.border = '5px solid yellow';
+	    }
+	    
+	    
+	    // Compute the character position in the state string
+	    num = board_array[j + i*6];
+	    td.appendChild(document.createTextNode(num));
+	}
+    }
+    return tbl;
+}
+		
+
+    
