@@ -9,8 +9,8 @@
 ##
 ## python GameEngine.py Alice Bob
 ##
-## By default the output will go into file game0.log
-## You can choose a different file as follows
+## By default each run writes to GameLogs/gameN.log (auto-incrementing)
+## You can choose a preferred suffix as follows
 ##
 ## python GameEngine.py Alice Bob X
 ##
@@ -22,6 +22,8 @@ import os
 import re
 import json
 import random
+from pathlib import Path
+
 import GameRules as Grules
 
 # Load the code for the AI players
@@ -40,10 +42,34 @@ if ( len(sys.argv) > 2):
 else:
     players['Dark'] = importlib.import_module('DefaultPlayer')
 
-if ( len(sys.argv) > 3):
-    filename = "game" + sys.argv[3] + ".log"
+LOG_DIR = Path(__file__).resolve().parent / "GameLogs"
+LOG_DIR.mkdir(parents=True, exist_ok=True)
+
+
+def _auto_log_path():
+    pattern = re.compile(r"game(\d+)\.log")
+    highest = -1
+    for entry in LOG_DIR.iterdir():
+        if not entry.is_file():
+            continue
+        match = pattern.fullmatch(entry.name)
+        if match:
+            highest = max(highest, int(match.group(1)))
+    next_index = highest + 1
+    return LOG_DIR / f"game{next_index}.log"
+
+
+def _explicit_log_path(arg):
+    candidate = LOG_DIR / f"game{arg}.log"
+    if candidate.exists():
+        return _auto_log_path()
+    return candidate
+
+
+if len(sys.argv) > 3:
+    filename = _explicit_log_path(sys.argv[3])
 else:
-    filename = "game0.log"
+    filename = _auto_log_path()
 
     
 ################################

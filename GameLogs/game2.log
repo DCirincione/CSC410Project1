@@ -1,0 +1,63 @@
+Light Player is CustomPlayer1 
+ Dark Player is MiniMaxPlayer1 
+Light plays first 
+Starting State is:
+{"Turn": "Light", "LightCapture": 0, "DarkCapture": 0, "Board": [1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]}
+Move for Light Player 
+{"Row": 5, "Col": 0, "Direction": "NE"}
+Move for Dark Player 
+{"Row": 0, "Col": 2, "Direction": "S"}
+Move for Light Player 
+{"Row": 0, "Col": 5, "Direction": "SW"}
+Move for Dark Player 
+{"Row": 2, "Col": 2, "Direction": "S"}
+Move for Light Player 
+{"Row": 1, "Col": 4, "Direction": "N"}
+Move for Dark Player 
+{"Row": 4, "Col": 2, "Direction": "E"}
+Move for Light Player 
+{"Row": 4, "Col": 1, "Direction": "S"}
+Move for Dark Player 
+{"Row": 4, "Col": 4, "Direction": "N"}
+Move for Light Player 
+{"Row": 0, "Col": 1, "Direction": "SW"}
+Move for Dark Player 
+{"Row": 3, "Col": 5, "Direction": "NW"}
+Move for Light Player 
+{"Row": 1, "Col": 0, "Direction": "E"}
+Move for Dark Player 
+{"Row": 2, "Col": 4, "Direction": "W"}
+Move for Light Player 
+{"Row": 1, "Col": 2, "Direction": "SW"}
+Move for Dark Player 
+{"Row": 3, "Col": 1, "Direction": "SE"}
+Move for Light Player 
+{"Row": 4, "Col": 5, "Direction": "SW"}
+Move for Dark Player 
+{"Row": 5, "Col": 5, "Direction": "NW"}
+Move for Light Player 
+{"Row": 5, "Col": 2, "Direction": "NW"}
+Move for Dark Player 
+{"Row": 2, "Col": 0, "Direction": "SE"}
+Move for Light Player 
+{"Row": 2, "Col": 5, "Direction": "NW"}
+Move for Dark Player 
+{"Row": 5, "Col": 3, "Direction": "E"}
+Move for Light Player 
+{"Row": 0, "Col": 3, "Direction": "SW"}
+Move for Dark Player 
+{"Row": 4, "Col": 0, "Direction": "NE"}
+Move for Light Player 
+{"Row": 1, "Col": 4, "Direction": "SW"}
+Move for Dark Player 
+{"Row": 3, "Col": 3, "Direction": "NW"}
+Move for Light Player 
+{"Row": 4, "Col": 1, "Direction": "NW"}
+Move for Dark Player 
+{"Row": 2, "Col": 2, "Direction": "NW"}
+Move for Light Player 
+{"Row": 3, "Col": 0, "Direction": "N"}
+Move for Dark Player 
+{"Row": 2, "Col": 0, "Direction": "SE"}
+Game Ends. Player Light has no legal moves.
+{"Turn": "Light", "LightCapture": 12, "DarkCapture": 17, "Board": [0, 0, 0, 0, 0, 0, 1, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1]}
