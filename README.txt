@@ -12,7 +12,7 @@ However, please do not create your own files called "GameEngine.py" or "GameRule
 
 You can run a game between two players with the command:
 
-python GameEngine.py Alice Bob
+python3 GameEngine.py Alice Bob
 
 ... replace Alice and Bob with the names of your players
 
@@ -25,7 +25,7 @@ The GameEngine creates logfiles.
 
 Once you have a logfile, you can watch the game in your web browser with the command:
 
-python VisualGame.py game0.log
+python3 VisualGame.py game0.log
 
 ... replace game0.log with the logfile of the game you want to watch
 
