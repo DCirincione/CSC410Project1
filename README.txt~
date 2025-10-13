@@ -12,9 +12,9 @@ However, please do not create your own files called "GameEngine.py" or "GameRule
 
 You can run a game between two players with the command:
 
-python GameEngine.py Alice Bob
+python GameEngine.py MiniMaxPlayer1 DefaultPlayer
 
-... replace Alice and Bob with the names of your players
+... replace Alice and Bob with the names of players
 
 ... The GameEngine assumes that any player Eve has a main file Eve.py
 
