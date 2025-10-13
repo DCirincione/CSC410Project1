@@ -12,7 +12,7 @@ CARDINALS = {'N', 'E', 'S', 'W'}
 #default depth before any extensions kick in
 BASE_DEPTH = 3
 #cap on how many bonus plies adaptive search may add
-MAX_EXTRA_DEPTH = 3
+MAX_EXTRA_DEPTH = 10
 #terminal scorer treats any capture lead beyond this as decisive
 WIN_SCORE = 1_000_000
 
@@ -144,7 +144,7 @@ def alpha_beta(state, depth, alpha, beta, player):
             next_state = GameRules.playMove(state, move)
             if next_state is None:
                 continue
-            #if recurse with decreased depth to evaluate child
+            #recurse with decreased depth to evaluate child
             value = max(value, alpha_beta(next_state, depth - 1, alpha, beta, player))
             alpha = max(alpha, value)
             if alpha >= beta:
