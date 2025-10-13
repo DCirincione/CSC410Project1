@@ -1,24 +1,32 @@
-# Minimax player with alpha–beta pruning
+"""
+MD — Minimax player with alpha-beta pruning
 
+This player chooses moves by exploring the game tree from the current state.
+Key ideas:
+  • Minimax: assume the opponent plays optimally. Maximize our outcome while the opponent minimizes it.
+  • Alpha-beta pruning: prune branches that cannot affect the final decision.
+  • Move ordering: search likely-strong moves first (captures, then consolidation), which increases pruning.
+  • Evaluation: at a depth limit, estimate position quality using material, mobility, and largest-stack potential.
+"""
+
+#imports
 import math
 import random
 import GameRules
-
-########### Public API ###########
 
 def name():
     return "MD"
 
 def getMove(state):
-    """Choose a move using iterative deepening + alpha-beta (depth-limited)."""
-    # Safety: if no moves exist, just return something benign (engine should not call us then)
+    # Iterative deepening: improve move ordering progressively.
+    # At each iteration, run alpha–beta and remember the best move.
     legal = GameRules.getAllLegalMoves(state)
     if not legal:
-        return {"Row": 0, "Col": 0, "Direction": "NW"}  # dummy
+        return {"Row": 0, "Col": 0, "Direction": "NW"}  
     
     # Iterative deepening for better move ordering (fixed max depth to keep runtime reasonable)
     best_move = legal[0]
-    max_depth = 3  # tweakable; increase if performance allows
+    max_depth = 3  
     alpha = -math.inf
     beta = math.inf
 
@@ -34,17 +42,16 @@ def getMove(state):
 
     return best_move
 
-########### Minimax + Alpha-Beta ###########
-
 def alphabeta_root(state, moves, depth, alpha, beta):
-    """Root driver: maximizing appears if it's Light's perspective? We define maximizing as 'player to move'."""
+    # Root of the search: treat the player-to-move as the maximizing player.
+    # Evaluate each candidate move, call alpha–beta one ply deeper, and keep track of the best.
     best_val = -math.inf
     best_move = None
 
     # Root uses player-to-move as "maximizing"
     for mv in moves:
         child = GameRules.playMove(state, mv)
-        if child is None:  # illegal, skip
+        if child is None:  
             continue
         val = alphabeta(child, depth - 1, alpha, beta, maximizing=False, root_player=state["Turn"])
         if val > best_val:
@@ -56,7 +63,12 @@ def alphabeta_root(state, moves, depth, alpha, beta):
     return best_val, best_move
 
 def alphabeta(state, depth, alpha, beta, maximizing, root_player):
-    # Terminal or depth cutoff
+    # Standard alpha–beta recursion.
+    # Terminal conditions:
+    #   • Game over -> compute exact final score via endGame().
+    #   • Depth == 0 -> call `evaluate()` for a heuristic estimate.
+    # Pruning:
+    #   • If alpha >= beta, no need to explore further moves along this branch.
     if GameRules.isGameOver(state):
         # Apply end-game bonus to evaluate true final score from this state
         final_state = GameRules.endGame(state)
@@ -67,8 +79,6 @@ def alphabeta(state, depth, alpha, beta, maximizing, root_player):
 
     legal = GameRules.getAllLegalMoves(state)
     if not legal:
-        # If no moves but GameRules.isGameOver returned False (shouldn't happen),
-        # treat as terminal with endGame() for safety.
         final_state = GameRules.endGame(state)
         return terminal_evaluation(final_state, root_player)
 
@@ -98,13 +108,8 @@ def alphabeta(state, depth, alpha, beta, maximizing, root_player):
                 break  # prune
         return value
 
-########### Evaluation Functions ###########
-
 def terminal_evaluation(state, root_player):
-    """Exact score at game end from root_player perspective.
-    Positive is good for root_player, negative favors opponent.
-    """
-    # At end, the capture counts include the largest-stack bonus already.
+    # Convert to a signed value from the root player's perspective.
     light_score = state.get("LightCapture", 0)
     dark_score = state.get("DarkCapture", 0)
 
@@ -122,9 +127,11 @@ def terminal_evaluation(state, root_player):
     return diff
 
 def evaluate(state, root_player):
-    """Heuristic evaluation at cutoff depth.
-    Mix material, mobility, max-stack potential, and opponent mobility pressure.
-    """
+    # Heuristic evaluation used when we hit the depth limit.
+    # Components:
+    #   • Material: captured pieces difference
+    #   • Largest-stack potential: proxy for end-game largest-stack bonus
+    #   • Mobility: legal moves and capture moves 
     light_cap = state.get("LightCapture", 0)
     dark_cap = state.get("DarkCapture", 0)
     brd = state.get("Board", [0]*36)
@@ -147,8 +154,7 @@ def evaluate(state, root_player):
     my_cap_count = sum(1 for m in my_moves if m["Direction"] in ("N","E","S","W"))
     my_move_score = 0.25*len(my_moves) + 0.75*my_cap_count
 
-    # Approximate opponent mobility by flipping turn (simulate turn pass by applying a null?)
-    # We can't pass a turn legally; instead, estimate by toggling 'Turn' and counting moves on a shallow copy.
+    # Approximate opponent mobility by flipping turn
     opp_state = copy_turn_only(state)
     opp_state["Turn"] = "Dark" if state["Turn"] == "Light" else "Light"
     opp_moves = GameRules.getAllLegalMoves(opp_state)
@@ -158,32 +164,29 @@ def evaluate(state, root_player):
     mobility = my_move_score - opp_move_score
 
     # Weighted sum
-    # Weights tuned conservatively to avoid overfitting
     score = (2.0 * material) + (0.6 * maxstack_term) + (0.5 * mobility)
 
-    # Tiny nudge for Light tie rule when material == 0 and stacks equal
+    # Tiny nudge for Light tie rule
     if score == 0 and root_player == "Light":
         score += 0.001
 
     return score
 
 def max_stacks(board_list):
-    """Return (light_max, dark_max) from the flat 6x6 board representation.
-    Square (0,0) is Dark; colors alternate checkerboard-style.
-    """
+    # Scan a flat 6×6 board list to find the largest stack on Light and Dark squares.
     light_max = 0
     dark_max = 0
     for idx, cnt in enumerate(board_list):
         r = idx // 6
         c = idx % 6
-        if ((r + c) % 2) == 0:  # Dark squares at (0,0) even parity per GameRules comment
+        if ((r + c) % 2) == 0: 
             dark_max = max(dark_max, cnt)
         else:
             light_max = max(light_max, cnt)
     return light_max, dark_max
 
 def copy_turn_only(state):
-    """Shallow copy the state keys sufficient for counting moves with a flipped turn."""
+    # Create a minimal copy of state with only the fields needed for move counting after flipping turn.
     new_state = {
         "Turn": state["Turn"],
         "LightCapture": state.get("LightCapture", 0),
@@ -192,15 +195,12 @@ def copy_turn_only(state):
     }
     return new_state
 
-########### Move Ordering ###########
-
 def order_moves(state, moves):
-    """Sort moves to improve alpha-beta pruning.
-    Priority:
-      1) Captures first (cardinal directions)
-      2) Moves yielding larger immediate material gain
-      3) Otherwise prefer moves that increase our max stack size
-    """
+    # Move ordering heuristic to speed up alpha–beta:
+    #   1) Captures first 
+    #   2) Immediate material gain from the child state
+    #   3) Increase in our max-stack potential relative to opponent
+
     # Pre-evaluate children cheaply to guide ordering
     scored = []
     for mv in moves:
@@ -228,7 +228,7 @@ def order_moves(state, moves):
     return [t[3] for t in scored]
 
 def move_to_front(moves, best):
-    """Place best move at the front of move list for next iteration (PV ordering)."""
+    # Take the best move from the previous iteration and search it first in the next iteration.
     if best not in moves:
         return moves
     out = [best] + [m for m in moves if m is not best]
