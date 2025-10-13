@@ -26,7 +26,6 @@ The GameEngine creates logfiles.
 Once you have a logfile, you can watch the game in your web browser with the command:
 
 python3 VisualGame.py GameLogs/game0.log #replace 0 with the game log number you want to run
-
 ... replace game0.log with the logfile of the game you want to watch
 
 ... Once VisualGame is running, you can go to your browser and visit:
